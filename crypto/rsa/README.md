@@ -190,6 +190,16 @@ c^d ≡ m (mod n)
 - 一种是把长信息分割成若干段短消息，每段分别加密
 - 一种是先选择一种"对称性加密算法"（比如DES，MD5），用这种算法的密钥加密信息，再用RSA公钥加密DES密钥。
 
+### RSA 生成公私钥时质数是怎么选的？[参考]()
+1. 给定RSA所要求N的位数n，选择一个大于65537的公钥e。
+2. 随机选择一个长度为(n + 1) / 2的质数。
+3. 选择一个长度为n - (n + 1) / 2 = (n - 1) / 2的质数q。
+4. 求|p-q|，如果差值位数过小，则回到2，重新选取p。
+5.计算N = pq，判断N的位数是否确实为n，如果不是，则回到2，重新选取p。
+6. 计算N的NAF权重，如果过小，则回到2，重新选取p。
+7. 求e在Z_N群下的逆元d，如果d过小，则回到2，重新选取p。
+8. 返回RSA的参数p、q、e、d等。
+
 文献参考：
 - 维基百科：
 [欧拉函数](https://zh.wikipedia.org/wiki/%E6%AC%A7%E6%8B%89%E5%87%BD%E6%95%B0) 
@@ -198,3 +208,4 @@ c^d ≡ m (mod n)
 - 阮一峰教程： [RSA算法原理（一）](http://www.ruanyifeng.com/blog/2013/06/rsa_algorithm_part_one.html)
 [RSA算法原理（二）](http://www.ruanyifeng.com/blog/2013/07/rsa_algorithm_part_two.html)
 - 其他 [轻松学习RSA加密算法原理](http://blog.csdn.net/sunmenggmail/article/details/11994013)
+[知乎:RSA 生成公私钥时质数是怎么选的？](https://www.zhihu.com/question/54779059?sort=created)
