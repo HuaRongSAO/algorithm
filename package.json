@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "bignumber.js": "^6.0.0",
+    "decimal.js": "^9.0.1",
     "randoma": "^1.1.0"
   }
 }
