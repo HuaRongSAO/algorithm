@@ -2,7 +2,7 @@ const Decimal = require('decimal.js')
 const {primes} = require('./prime-table.json')
 
 // 二进制生成512位大数
-const generiteBigNumber = () => {
+const generateBigNumber = () => {
   let bigNumberBinay = '0b1'
   while (bigNumberBinay.length !== 514) {
     bigNumberBinay += Math.floor(Math.random() * 10 >4.5) ? '1': '0'
@@ -18,10 +18,11 @@ const checkPrimeTable = n => {
   return true
 }
 
-// 
-
-const generitePrime = () => {
-  const bn = generiteBigNumber()
-  return checkPrimeTable(bn) ? bn.d.join('') : generitePrime()
+// 返回
+const generatePrime = () => {
+  const bn = generateBigNumber()
+  return checkPrimeTable(bn) ? bn.d.join('') : generatePrime()
 }
-console.log(generitePrime())
+console.log(generatePrime())
+
+module.export = generatePrime
