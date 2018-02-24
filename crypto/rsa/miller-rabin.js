@@ -1,17 +1,18 @@
 const Decimal = require('decimal.js')
 
 class MillerRabin {
-  constructor (number) {
+  constructor (number, security = 8) {
     if (typeof number !== 'string' || number === '') throw new Error('MillerRabin 必须传入 十进制,string类型')
     this.number = number
     this.bn = new Decimal(number)
+    this.security = security // 安全系数 循环8次的为素数 99.998+%
   }
 
   isPrime () {
     const {number, bn} = this
     if (number === '2') return true
     if (bn.lt(2) || this.isEven()) return false
-    const t = this.millerRabinLoop(5)
+    const t = this.millerRabinLoop()
     return t
   }
 
@@ -20,10 +21,9 @@ class MillerRabin {
     if (bn.mod(2) === 0) return true
     return false
   }
-
+  // 随机一个和n一样长度的随机数
   getRandom () {
     let len = this.bn.toBinary().length
-
     let rn = '0b'
     while (rn.length !== (len + 1)) {
       rn += Math.floor(Math.random() * 10 > 4.5) ? '1' : '0'
@@ -38,19 +38,19 @@ class MillerRabin {
     return product.mod(n)
   }
 
-  //快速幂取模 a ^ b mod p = ((a mod p)^b) mod p
-  ModExp (a, b, n) {
-    let i = new Decimal(0)
+  //快速幂取模 a ^ u mod p = ((a mod p)^u) mod p
+  ModExp (a, u, n) {
+    let i = new Decimal(1)
     let c = a
-    while (!b.equals(i)) {
+    while (!u.equals(i)) {
       c = this.modMul(c, a, n)
       i = i.plus(1)  
     }
     return c
   }
-
-  millerRabinLoop (s) {
-    const {bn} = this
+  // MillerRabin 循环验证
+  millerRabinLoop () {
+    const {bn, security} = this
     // n-1 = u*2^t
     let t = 0
     let u = bn.sub(1)
@@ -58,32 +58,30 @@ class MillerRabin {
       u = u.div(2).floor()
       t++
     }
-    console.log('u,t',u.d,t)
-    for (let i = 0; i < s; i++) {
+    for (let i = 0; i < security; i++) {
       let a = this.getRandom()
-      while (a.lt(1) || a.gt(bn)) {
+      while (a.lte(1) || a.gte(bn)) {
         a = this.getRandom()
       }
       // x=(a^u) mod n
       let x =  this.ModExp(a, u, bn)
-      console.log('a' + a.d)
-      console.log('x' + x.d)
       for (let j = 0; j < t; j++) {
-        // console.log('x:' + j + ':', x.d)
-        let y = x.pow(2).mod(bn)
-        console.log('y:' + j + ':', y.d)
+        let y = x.mul(x).mod(bn)
         if (y.equals(1) && !x.equals(1) && !x.equals(bn.sub(1))) return false
         x = y
       }
       // 这里的时候x=a^(n-1)，根据费马小定理，x!=1的话，肯定不是素数了
-      console.log('x.equals(1)' + x.equals(1))
-      if (x.equals(1)) return true
       if (!x.equals(1)) return false
     }
     return true
   }
 
 }
-
-const mr = new MillerRabin('13')
+let start = new Date().getTime()
+console.log('start')
+const mr = new MillerRabin('319489', 2)
 console.log(mr.isPrime())
+let end = new Date().getTime()
+console.log('end')
+console.log('time:', end - start)
+
